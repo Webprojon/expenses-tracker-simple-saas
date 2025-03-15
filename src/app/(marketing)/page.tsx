@@ -19,6 +19,7 @@ export default function Home() {
 					Use Expenses Tracker to easly keep track of your expenses. Get
 					lifetime access for $99.
 				</p>
+				{/*<Link href="/app/dashboard">Go Dashboard</Link>*/}
 			</div>
 		</div>
 	);
