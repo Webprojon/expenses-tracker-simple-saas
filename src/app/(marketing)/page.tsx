@@ -1,3 +1,4 @@
+import { LoginLink, RegisterLink } from "@kinde-oss/kinde-auth-nextjs/server";
 import Image from "next/image";
 
 export default function Home() {
@@ -19,7 +20,16 @@ export default function Home() {
 					Use Expenses Tracker to easly keep track of your expenses. Get
 					lifetime access for $99.
 				</p>
-				{/*<Link href="/app/dashboard">Go Dashboard</Link>*/}
+
+				<div className="mt-10 space-x-3">
+					<LoginLink className="bg-black text-white py-2 px-6 rounded-lg font-medium">
+						Login
+					</LoginLink>
+
+					<RegisterLink className="bg-black/50 text-white py-2 px-6 rounded-lg font-medium">
+						Register
+					</RegisterLink>
+				</div>
 			</div>
 		</div>
 	);

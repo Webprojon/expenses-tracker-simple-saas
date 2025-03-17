@@ -1,4 +1,5 @@
 "use client";
+import { LogoutLink } from "@kinde-oss/kinde-auth-nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -18,7 +19,7 @@ export default function AppHeader() {
 	const pathname = usePathname();
 
 	return (
-		<header className="flex justify-between items-center border-b border-white/20 py-3">
+		<header className="flex items-center border-b border-white/20 py-3">
 			<Link href="/app/dashboard">
 				<Image
 					alt="logo"
@@ -28,7 +29,7 @@ export default function AppHeader() {
 				/>
 			</Link>
 
-			<nav>
+			<nav className="ml-auto">
 				<ul className="flex gap-3">
 					{routes.map((route) => (
 						<li key={route.path}>
@@ -43,6 +44,7 @@ export default function AppHeader() {
 					))}
 				</ul>
 			</nav>
+			<LogoutLink className="text-white/70 ml-[10px]">Logout</LogoutLink>
 		</header>
 	);
 }
