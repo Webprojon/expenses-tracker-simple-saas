@@ -1,18 +1,14 @@
 "use server";
 
 import { prisma } from "@/lib/db";
+import { checkAuthenticationAndMembership } from "@/lib/server-utils";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import Stripe from "stripe";
 
 export async function addExpense(formData: FormData) {
-	// Authentication check
-	const { isAuthenticated, getUser } = getKindeServerSession();
-	if (!(await isAuthenticated())) {
-		redirect("/api/auth/login");
-	}
-
-	const user = await getUser();
+	const user = await checkAuthenticationAndMembership();
 
 	await prisma.expense.create({
 		data: {
@@ -26,11 +22,7 @@ export async function addExpense(formData: FormData) {
 }
 
 //export async function updateExpense(formData: FormData, id: number) {
-// Authentication check
-//const { isAuthenticated } = getKindeServerSession();
-//if (!(await isAuthenticated())) {
-//	redirect("/api/auth/login");
-//}
+// 	await checkAuthenticationAndMembership();
 
 //	await prisma.expense.update({
 //		where: {
@@ -46,11 +38,7 @@ export async function addExpense(formData: FormData) {
 //}
 
 export async function deleteExpense(id: number) {
-	// Authentication check
-	const { isAuthenticated } = getKindeServerSession();
-	if (!(await isAuthenticated())) {
-		redirect("/api/auth/login");
-	}
+	await checkAuthenticationAndMembership();
 
 	await prisma.expense.delete({
 		where: {
@@ -59,4 +47,34 @@ export async function deleteExpense(id: number) {
 	});
 
 	revalidatePath("/app/dashboard");
+}
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+	apiVersion: "2025-02-24.acacia",
+});
+
+export async function createCheckoutSession() {
+	// Authentication check
+	const { isAuthenticated, getUser } = getKindeServerSession();
+	if (!(await isAuthenticated())) {
+		redirect("/api/auth/login");
+	}
+
+	const user = await getUser();
+
+	const session = await stripe.checkout.sessions.create({
+		customer_email: user.email!,
+		client_reference_id: user.id,
+		line_items: [
+			{
+				price: "price_1R3VA9IA3CTybG9VAbohpu0h",
+				quantity: 1,
+			},
+		],
+		mode: "payment",
+		success_url: "http://localhost:3000/app/dashboard?payment=success",
+		cancel_url: "http://localhost:3000",
+	});
+
+	redirect(session.url!);
 }

@@ -1,17 +1,18 @@
 import ExpensesForm from "@/components/expenses-form";
 import ExpensesList from "@/components/expenses-list";
 import { prisma } from "@/lib/db";
-import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
-import { redirect } from "next/navigation";
+import { checkAuthenticationAndMembership } from "@/lib/server-utils";
 
-export default async function Page() {
-	// Authentication check
-	const { isAuthenticated, getUser } = getKindeServerSession();
-	if (!(await isAuthenticated())) {
-		redirect("/api/auth/login");
-	}
+export default async function Page({
+	searchParams,
+}: {
+	searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+	const paymentValueFromUrl = (await searchParams).payment;
+	const user = await checkAuthenticationAndMembership(
+		paymentValueFromUrl === "success" ? 3000 : 0,
+	);
 
-	const user = await getUser();
 	const expenses = await prisma.expense.findMany({
 		where: {
 			creatorId: user.id,
