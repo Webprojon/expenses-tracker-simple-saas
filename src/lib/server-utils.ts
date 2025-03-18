@@ -1,5 +1,3 @@
-import "server only";
-
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { redirect } from "next/navigation";
 import { prisma } from "./db";
